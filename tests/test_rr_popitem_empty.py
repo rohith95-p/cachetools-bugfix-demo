@@ -1,4 +1,5 @@
 import pytest
+
 import cachetools
 
 
@@ -17,7 +18,7 @@ def test_rr_popitem_empty_with_max_choice():
 
 
 def test_rr_popitem_empty_with_next_iter_choice():
-    cache = cachetools.RRCache(maxsize=2, choice=next)
+    cache = cachetools.RRCache(maxsize=2, choice=lambda seq: next(iter(seq)))
     with pytest.raises(KeyError) as excinfo:
         cache.popitem()
     assert excinfo.value.args[0] == "RRCache is empty"
@@ -26,6 +27,7 @@ def test_rr_popitem_empty_with_next_iter_choice():
 def test_rr_popitem_empty_with_custom_choice_that_raises_value_error():
     def my_choice(seq):
         raise ValueError("custom")
+
     cache = cachetools.RRCache(maxsize=2, choice=my_choice)
     with pytest.raises(KeyError) as excinfo:
         cache.popitem()
@@ -35,6 +37,7 @@ def test_rr_popitem_empty_with_custom_choice_that_raises_value_error():
 def test_rr_popitem_empty_with_custom_choice_that_raises_runtime_error():
     def my_choice(seq):
         raise RuntimeError("custom")
+
     cache = cachetools.RRCache(maxsize=2, choice=my_choice)
     with pytest.raises(KeyError) as excinfo:
         cache.popitem()
